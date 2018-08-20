@@ -911,8 +911,8 @@ peony_application_create_desktop_windows (PeonyApplication *application)
         g_signal_connect (window, "unrealize",
                           G_CALLBACK (desktop_unrealize_cb), selection_widget);
 
-        /* We realize it immediately so that the CAJA_DESKTOP_WINDOW_ID
-           property is set so mate-settings-daemon doesn't try to set the
+        /* We realize it immediately so that the PEONY_DESKTOP_WINDOW_ID
+           property is set so ukui-settings-daemon doesn't try to set the
            background. And we do a gdk_flush() to be sure X gets it. */
         gtk_widget_realize (GTK_WIDGET (window));
         gdk_flush ();
@@ -1755,7 +1755,7 @@ peony_application_get_session_data (PeonyApplication *self)
         xmlSaveFlush (ctx) < 0) {
         g_message ("failed to save session");
     }
-
+    
     xmlSaveClose(ctx);
     data = g_strndup (buffer->content, buffer->use);
     xmlBufferFree (buffer);
@@ -1777,7 +1777,7 @@ peony_application_load_session (PeonyApplication *application)
    if (!egg_sm_client_is_resumed (application->smclient))
     {
         return;
-    }
+  } 
 
     state_file = egg_sm_client_get_state_file (application->smclient);
     if (!state_file)
@@ -1795,7 +1795,7 @@ peony_application_load_session (PeonyApplication *application)
     }
 
     bail = TRUE;
-
+    
     doc = xmlReadMemory (data, strlen (data), NULL, "UTF-8", 0);
     if (doc != NULL && (root_node = xmlDocGetRootElement (doc)) != NULL)
     {
@@ -2284,7 +2284,8 @@ peony_application_local_command_line (GApplication *application,
  out:
     g_option_context_free (context);
 
-    return TRUE;
+
+    return TRUE;    
 }
 
 
@@ -2358,7 +2359,7 @@ init_desktop (PeonyApplication *self)
                   self);
 }
 
-static gboolean
+static gboolean 
 peony_application_save_accel_map (gpointer data)
 {
     if (save_of_accel_map_requested) {
@@ -2374,7 +2375,7 @@ peony_application_save_accel_map (gpointer data)
     return FALSE;
 }
 
-static void
+static void 
 queue_accel_map_save_callback (GtkAccelMap *object, gchar *accel_path,
         guint accel_key, GdkModifierType accel_mods,
         gpointer user_data)
@@ -2453,15 +2454,15 @@ peony_application_startup (GApplication *app)
     /* initialize theming */
     init_icons_and_styles ();
     init_gtk_accels ();
-
+    
     /* initialize peony modules */
     peony_module_setup ();
 
     /* attach menu-provider module callback */
     menu_provider_init_callback ();
-
+    
     /* Initialize notifications for eject operations */
-    notify_init (GETTEXT_PACKAGE);
+    notify_init (GETTEXT_PACKAGE);  
 
     /* Watch for unmounts so we can close open windows */
     /* TODO-gio: This should be using the UNMOUNTED feature of GFileMonitor instead */

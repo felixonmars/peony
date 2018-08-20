@@ -35,11 +35,12 @@
 #include <libpeony-private/peony-file-utilities.h>
 #include <libpeony-private/peony-icon-names.h>
 #include <gio/gio.h>
-#include <glib/gi18n.h>
+#include <glib/gi18n.h>    
 
 struct PeonyDesktopWindowDetails
 {
     gulong size_changed_id;
+
     gboolean loaded;
 };
 
@@ -50,38 +51,41 @@ G_DEFINE_TYPE (PeonyDesktopWindow, peony_desktop_window,
 static void
 peony_desktop_window_init (PeonyDesktopWindow *window)
 {
-    GtkAction *action;
-    AtkObject *accessible;
+	    GtkAction *action;
+	        AtkObject *accessible;
 
-    window->details = G_TYPE_INSTANCE_GET_PRIVATE (window, PEONY_TYPE_DESKTOP_WINDOW,
-                                                   PeonyDesktopWindowDetails);
+		    window->details = G_TYPE_INSTANCE_GET_PRIVATE (window, PEONY_TYPE_DESKTOP_WINDOW,
+				                                                       PeonyDesktopWindowDetails);
 
-    GtkStyleContext *context;
+		        GtkStyleContext *context;
 
-    context = gtk_widget_get_style_context (GTK_WIDGET (window));
-    gtk_style_context_add_class (context, "peony-desktop-window");
+			    context = gtk_widget_get_style_context (GTK_WIDGET (window));
+			        gtk_style_context_add_class (context, "peony-desktop-window");
 
-    gtk_window_move (GTK_WINDOW (window), 0, 0);
+				    gtk_window_move (GTK_WINDOW (window), 0, 0);
 
-    /* shouldn't really be needed given our semantic type
-     ** of _NET_WM_TYPE_DESKTOP, but why not
-     **/
-    gtk_window_set_resizable (GTK_WINDOW (window), FALSE);
+				        /* shouldn't really be needed given our semantic type
+					 *      * of _NET_WM_TYPE_DESKTOP, but why not
+					 *           */
+				        gtk_window_set_resizable (GTK_WINDOW (window),
+							                              FALSE);
 
-    g_object_set_data (G_OBJECT (window), "is_desktop_window", GINT_TO_POINTER (1));
+					    g_object_set_data (G_OBJECT (window), "is_desktop_window",
+							                           GINT_TO_POINTER (1));
 
-    gtk_widget_hide (PEONY_WINDOW (window)->details->statusbar);
-    gtk_widget_hide (PEONY_WINDOW (window)->details->menubar);
-    /* Don't allow close action on desktop */
-    action = gtk_action_group_get_action (PEONY_WINDOW (window)->details->main_action_group, PEONY_ACTION_CLOSE);
-    gtk_action_set_sensitive (action, FALSE);
+					        gtk_widget_hide (PEONY_WINDOW (window)->details->statusbar);
+						    gtk_widget_hide (PEONY_WINDOW (window)->details->menubar);
+						    /* Don't allow close action on desktop */
+						        action = gtk_action_group_get_action (PEONY_WINDOW (window)->details->main_action_group,
+									                                          PEONY_ACTION_CLOSE);
+							    gtk_action_set_sensitive (action, FALSE);
 
-    /* Set the accessible name so that it doesn't inherit the cryptic desktop URI. */
-    accessible = gtk_widget_get_accessible (GTK_WIDGET (window));
+							        /* Set the accessible name so that it doesn't inherit the cryptic desktop URI. */
+							        accessible = gtk_widget_get_accessible (GTK_WIDGET (window));
 
-    if (accessible) {
-        atk_object_set_name (accessible, _("Desktop"));
-    }
+								    if (accessible) {
+									            atk_object_set_name (accessible, _("Desktop"));
+										        }
 }
 
 static gint
@@ -144,9 +148,7 @@ peony_desktop_window_new (PeonyApplication *application,
     gtk_window_set_default_size (GTK_WINDOW (window), -1, -1);
 #endif
     /* Special sawmill setting*/
-    /* We use 'Caja' to compatible with mate-settigns-daemon */
-    /* See: caja_is_drawing_bg in plugins/background/msd-background-manager.c */
-    gtk_window_set_wmclass (GTK_WINDOW (window), "desktop_window", "Caja");
+    gtk_window_set_wmclass (GTK_WINDOW (window), "desktop_window", "Peony");
 
     g_signal_connect (window, "delete_event", G_CALLBACK (peony_desktop_window_delete_event), NULL);
 
@@ -179,11 +181,8 @@ unrealize (GtkWidget *widget)
     root_window = gdk_screen_get_root_window (
                       gtk_window_get_screen (GTK_WINDOW (window)));
 
-    /* We use 'CAJA_DESKTOP_WINDOW_ID' to compatible with mate-settigns-daemon.
-     * See: caja_is_drawing_bg in plugins/background/msd-background-manager.c
-     */
     gdk_property_delete (root_window,
-                         gdk_atom_intern ("CAJA_DESKTOP_WINDOW_ID", TRUE));
+                         gdk_atom_intern ("PEONY_DESKTOP_WINDOW_ID", TRUE));
 
     if (details->size_changed_id != 0) {
         g_signal_handler_disconnect (gtk_window_get_screen (GTK_WINDOW (window)),
@@ -221,11 +220,8 @@ set_desktop_window_id (PeonyDesktopWindow *window,
 
     window_xid = GDK_WINDOW_XID (gdkwindow);
 
-    /* We use 'CAJA_DESKTOP_WINDOW_ID' to compatible with mate-settigns-daemon.
-     * See: caja_is_drawing_bg in plugins/background/msd-background-manager.c
-     */
     gdk_property_change (root_window,
-                         gdk_atom_intern ("CAJA_DESKTOP_WINDOW_ID", FALSE),
+                         gdk_atom_intern ("PEONY_DESKTOP_WINDOW_ID", FALSE),
                          gdk_x11_xatom_to_atom (XA_WINDOW), 32,
                          GDK_PROP_MODE_REPLACE, (guchar *) &window_xid, 1);
 }
